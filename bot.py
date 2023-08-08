@@ -1,25 +1,22 @@
-import slack_sdk
-from slack_sdk import WebClient
-from slack_sdk.rtm_v2 import RTMClient
+from slack_bolt import App
+from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-# instantiate WebClient
-slack_token = 'xoxb-23072537313-5702482460518-9j1BvWA2PFJoISjz2QsiCwRz'
-client = WebClient(token=slack_token)
+app = App(token="xoxb-23072537313-5702482460518-9j1BvWA2PFJoISjz2QsiCwRz", signing_secret="36dc3726212897abf360add7dda0d67e")
 
-@RTMClient.run_on(event='message')
-def respond_to_message(**payload):
-    data = payload['data']
-    web_client = payload['web_client']
-    if 'Hello' in data.get('text', []):
-        channel_id = data['channel']
-        thread_ts = data['ts']
-        user = data['user']
-
-        web_client.chat_postMessage(
-            channel=channel_id,
-            text=f"Hello <@{user}>!",
-            thread_ts=thread_ts
-        )
-
-rtm_client = RTMClient(token=slack_token)
-rtm_client.start()
+@app.command("/guesswho")
+def handle_guesswho(ack, command, client):
+    # Acknowledge the command request
+    ack()
+    
+    # Process the command
+    response_text = "You initiated a Guess Who game!"
+    
+    # Send a response
+    client.chat_postEphemeral(
+        channel=command["channel_id"],
+        user=command["user_id"],
+        text=response_text
+    )
+if __name__ == "__main__":
+    SocketModeHandler(app, "xapp-1-A05LV0NDQN6-5732789533200-716969f0baadb571500ed939e54b50038b1f8288538409eabb7c44bfde3e06d2
+").start()
